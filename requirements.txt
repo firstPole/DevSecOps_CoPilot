@@ -1,0 +1,13 @@
+python-docx
+spacy
+sentence-transformers
+qdrant-client
+openai
+streamlit
+aiohttp
+httpx
+torch 
+torchvision 
+torchaudio
+
+gitpython 

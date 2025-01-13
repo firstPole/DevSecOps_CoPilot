@@ -1,0 +1,92 @@
+To create a CI/CD pipeline using AWS services to deploy a microservice application to an Amazon EKS (Elastic Kubernetes Service) cluster with Helm, it's essential to structure the pipeline in stages that ensure best practices in security, monitoring, maintainability, scalability, and vulnerability management. Below is a detailed outline of the ideal stages of the CI/CD pipeline, along with some guidance documentation.
+
+### Ideal AWS CodePipeline Stages for EKS Deployment
+
+1. **Source Stage**
+   - **Service:** AWS CodeCommit or GitHub
+   - **Description:** This stage is responsible for detecting changes to the microservice code repository. When a developer pushes code to the repository, it triggers the pipeline.
+   - **Best Practices:**
+     - Use protected branches and require pull requests for changes.
+     - Ensure branch policies enforce code reviews.
+
+2. **Build Stage**
+   - **Service:** AWS CodeBuild
+   - **Description:** This stage builds the Docker images for the microservices and runs static code analysis.
+   - **Best Practices:**
+     - Use a Dockerfile to create the application image.
+     - Integrate tools like SonarQube or Trivy for vulnerability scanning during the build process.
+     - Store the built images in Amazon ECR (Elastic Container Registry).
+
+3. **Test Stage**
+   - **Service:** AWS CodeBuild
+   - **Description:** This stage runs unit tests, integration tests, and end-to-end tests.
+   - **Best Practices:**
+     - Use CI tools to automate testing.
+     - Ensure tests cover a high percentage of the application.
+     - Implement security testing (e.g., OWASP ZAP) during this stage.
+
+4. **Staging Deployment Stage**
+   - **Service:** AWS CodeBuild or AWS Lambda (if using serverless deployment)
+   - **Description:** This stage deploys the application to a staging environment in EKS using Helm.
+   - **Best Practices:**
+     - Use Helm charts to manage Kubernetes manifests.
+     - Implement automatic rollbacks on failed deployments.
+     - Use staging to perform load testing and user acceptance testing.
+
+5. **Approval Stage**
+   - **Service:** Manual Approval
+   - **Description:** This stage requires manual approval before deploying to production.
+   - **Best Practices:**
+     - Ensure that stakeholders review the changes.
+     - Provide a summary of changes, test results, and vulnerability reports for review.
+
+6. **Production Deployment Stage**
+   - **Service:** AWS CodeBuild
+   - **Description:** This stage deploys the application to the production environment in EKS using Helm.
+   - **Best Practices:**
+     - Use Helm’s built-in rollback capabilities.
+     - Monitor application health and performance during deployment.
+     - Ensure deployments are canary or blue/green for reduced risk.
+
+7. **Monitoring and Logging Stage**
+   - **Service:** Amazon CloudWatch, AWS X-Ray
+   - **Description:** This stage involves setting up monitoring and logging for the deployed application.
+   - **Best Practices:**
+     - Implement logging and monitoring for all microservices.
+     - Use service meshes like Istio or Linkerd for observability.
+     - Set up alerts for performance and security metrics.
+
+8. **Feedback and Iteration Stage**
+   - **Service:** Various (depends on feedback system)
+   - **Description:** Collects feedback from the monitoring tools and users to improve the application.
+   - **Best Practices:**
+     - Use logs and metrics to identify areas for improvement.
+     - Continuously refine the CI/CD pipeline based on feedback.
+
+### Guidance Document
+
+#### 1. **Setting Up EKS**
+   - Follow the AWS documentation to create an EKS cluster and configure kubectl to communicate with your cluster.
+   - Ensure IAM roles and policies are correctly set up for accessing EKS.
+
+#### 2. **Helm Installation**
+   - Install Helm on your local machine and configure it to use the EKS cluster.
+   - Create a Helm chart for your microservice, ensuring that best practices for Helm charts are followed (e.g., using values.yaml for configuration).
+
+#### 3. **CodeBuild Configuration**
+   - Create a `buildspec.yml` file for CodeBuild that defines the build and test commands.
+   - Configure environment variables for sensitive data using AWS Secrets Manager.
+
+#### 4. **Monitoring and Alerts**
+   - Set up CloudWatch Alarms based on application metrics.
+   - Use Amazon CloudTrail for security and compliance monitoring.
+
+#### 5. **Security Best Practices**
+   - Regularly scan Docker images for vulnerabilities using tools like Amazon Inspector.
+   - Implement network policies in Kubernetes to restrict traffic between services.
+
+#### 6. **Documentation and Training**
+   - Document the CI/CD process for your team, ensuring they are trained on using the pipeline effectively.
+   - Use version control for documentation and keep it updated.
+
+By following this structured approach to your AWS CodePipeline, you can ensure a robust, secure, and efficient deployment process for your microservices on Amazon EKS using Helm.
