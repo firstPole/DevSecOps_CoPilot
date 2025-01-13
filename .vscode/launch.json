@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "Debug Streamlit App",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/my_env/bin/streamlit",
+            "args": ["run", "${workspaceFolder}/streamlit_app.py"],
+            "console": "integratedTerminal",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/my_env/lib/python3.12.3/site-packages"
+            }
+        }
+    ]
+}
