@@ -17,7 +17,7 @@ Clone the repository to your local machine:
 git clone https://github.com/firstPole/DevSecOps_CoPilot.git
 cd DevSecOps_CoPilot
 ## Install the required dependencies:
-pip install -r requirements.txt
+pip install -r requirements.txt```
 How It Works
 1. GenAI for Code Analysis
 DevSecOps_CoPilot uses Generative AI to analyze your code and configurations, automatically identifying vulnerabilities and suggesting fixes. The AI engine is trained to detect security flaws such as SQL injection, cross-site scripting (XSS), and other common vulnerabilities.
