@@ -2,3 +2,5 @@ my_env/
 .env
 firstPole/JavaJenkinsPipelineSample/
 
+__pycache__/
+*.pyc

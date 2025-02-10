@@ -9,5 +9,10 @@ httpx
 torch 
 torchvision 
 torchaudio
-
-gitpython 
+pyyaml
+gitpython
+diagrams
+graphviz
+boto3
+ruamel.yaml
+plotly
