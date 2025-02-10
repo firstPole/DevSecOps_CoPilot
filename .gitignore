@@ -4,4 +4,5 @@ firstPole/JavaJenkinsPipelineSample/
 
 __pycache__/
 *.pyc
-firstPole
+firstPole/
+repo/pipelines/
