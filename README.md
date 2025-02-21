@@ -43,12 +43,14 @@ The **DevSecOps Co-Pilot** is an AI-powered security guidance system designed to
 - **Proactive Vulnerability Mitigation**: Encourages secure coding practices by offering actionable recommendations.  
 
 ---
+## Some Screenshots
 
 
-Contributing
+
+## Contributing
 We welcome contributions to DevSecOps_CoPilot! If you'd like to improve the project, follow these steps:
 
-Fork the repository.
+### Fork the repository.
 Create a new branch (git checkout -b feature-branch).
 Commit your changes (git commit -m 'Add new feature').
 Push your branch to your fork (git push origin feature-branch).
@@ -56,6 +58,6 @@ Open a pull request to the main repository.
 License
 This project is licensed under the MIT License. See the LICENSE file for more details.
 
-Acknowledgments
+## Acknowledgments
 Thanks to the community and contributors for maintaining the open-source libraries used in this project.
 Special thanks to the developers of the GenAI, NLP, and Vector Database technologies used to power this platform.
