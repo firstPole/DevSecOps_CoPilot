@@ -29,12 +29,12 @@ The **DevSecOps Co-Pilot** is an AI-powered security guidance system designed to
      - Generates AI-powered security-aware recommendations.  
 
 ## Workflow  
-1. The **developer** submits a security-related query via the **Streamlit UI**.  
-2. The **Processing Layer** extracts and processes security knowledge from internal documents.  
-3. The **Qdrant vector database** stores and retrieves relevant information using **semantic search**.  
-4. The **RAG module** fetches the most relevant security guidance.  
-5. The **Azure OpenAI model** enhances the response by generating context-aware, AI-driven security recommendations.  
-6. The final response is displayed to the developer, helping ensure secure coding practices.  
+   1. The **developer** submits a security-related query via the **Streamlit UI**.  
+   2. The **Processing Layer** extracts and processes security knowledge from internal documents.  
+   3. The **Qdrant vector database** stores and retrieves relevant information using **semantic search**.  
+   4. The **RAG module** fetches the most relevant security guidance.  
+   5. The **Azure OpenAI model** enhances the response by generating context-aware, AI-driven security recommendations.  
+   6. The final response is displayed to the developer, helping ensure secure coding practices.  
 
 ## Key Benefits  
 - **AI-Driven Security Guidance**: Enhances security awareness in development workflows.  
@@ -51,12 +51,13 @@ The **DevSecOps Co-Pilot** is an AI-powered security guidance system designed to
 We welcome contributions to DevSecOps_CoPilot! If you'd like to improve the project, follow these steps:
 
 ### Fork the repository.
-Create a new branch (git checkout -b feature-branch).
-Commit your changes (git commit -m 'Add new feature').
-Push your branch to your fork (git push origin feature-branch).
-Open a pull request to the main repository.
-License
-This project is licensed under the MIT License. See the LICENSE file for more details.
+   1.  Create a new branch (git checkout -b feature-branch).
+   2.  Commit your changes (git commit -m 'Add new feature').
+   3.  Push your branch to your fork (git push origin feature-branch).
+   4.  Open a pull request to the main repository.
+
+## License
+   This project is licensed under the MIT License. See the LICENSE file for more details.
 
 ## Acknowledgments
 Thanks to the community and contributors for maintaining the open-source libraries used in this project.
