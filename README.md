@@ -36,6 +36,8 @@ The **DevSecOps Co-Pilot** is an AI-powered security guidance system designed to
    5. The **Azure OpenAI model** enhances the response by generating context-aware, AI-driven security recommendations.  
    6. The final response is displayed to the developer, helping ensure secure coding practices.  
 
+
+
 ## Key Benefits  
 - **AI-Driven Security Guidance**: Enhances security awareness in development workflows.  
 - **Efficient Knowledge Retrieval**: Uses vector search to provide precise security insights.  
@@ -43,6 +45,38 @@ The **DevSecOps Co-Pilot** is an AI-powered security guidance system designed to
 - **Proactive Vulnerability Mitigation**: Encourages secure coding practices by offering actionable recommendations.  
 
 ---
+## Setup Guide for Developers
+
+To set up DevSecOps Co-Pilot in your local development environment, follow these steps:
+
+1. Fork and Clone the Repository
+
+```bash
+git clone https://github.com/YOUR_GITHUB_USERNAME/DevSecOps_CoPilot.git  
+cd DevSecOps_CoPilot  
+```
+2. Create and Activate a Virtual Environment
+
+On macOS/Linux:
+```bash
+python3 -m venv venv  
+source venv/bin/activate  
+```
+On Windows:
+```bash
+python -m venv venv  
+venv\Scripts\activate  
+```
+3. Install Dependencies
+```bash
+pip install -r requirements.txt  
+```
+4. Run the Streamlit Application
+```bash
+streamlit run streamlit_app.py
+```
+
+
 ## Some Screenshots
 
 
