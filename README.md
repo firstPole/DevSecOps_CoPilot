@@ -77,9 +77,6 @@ streamlit run streamlit_app.py
 ```
 
 
-## Some Screenshots
-
-
 
 ## Contributing
 We welcome contributions to DevSecOps_CoPilot! If you'd like to improve the project, follow these steps:
