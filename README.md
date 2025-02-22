@@ -1,3 +1,8 @@
+![Build Status](https://img.shields.io/github/workflow/status/YOUR_USERNAME/DevSecOps_CoPilot/CI)
+![License](https://img.shields.io/github/license/YOUR_USERNAME/DevSecOps_CoPilot)
+
+
+
 # DevSecOps Co-Pilot Architecture  
 
 ## Overview  
