@@ -1,4 +1,4 @@
-# AIDevOps Architecture  
+# About AIDevOps
 
 ## Overview  
 The **AI DevOps** is an AI-powered security guidance system designed to assist developers in generating secure pipeline code. It leverages Natural Language Processing (NLP), vector-based semantic search, and AI-driven recommendations to generate the Secure and industry standard CI/CD pipelines for any CI/CD tools like Jenkins, Azure DevOps, Gitlab CI, Github Actions etc..  
