@@ -1,0 +1,150 @@
+Below is a sample AWS CodeDeploy CI/CD pipeline for deploying a microservice application to Amazon EKS (Elastic Kubernetes Service) using Helm. The pipeline includes AWS CodeCommit for source control, AWS CodeBuild for building the application, and AWS CodePipeline for orchestration.
+
+### AWS CodeDeploy CI/CD Pipeline Configuration
+
+#### 1. `buildspec.yml`
+This file is used by AWS CodeBuild to define the build process.
+
+```yaml
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      docker: 20
+      nodejs: 14
+    commands:
+      - echo "Installing Helm"
+      - curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
+  pre_build:
+    commands:
+      - echo "Logging into ECR"
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_URI
+  build:
+    commands:
+      - echo "Building Docker image"
+      - docker build -t $IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION .
+      - docker tag $IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION $ECR_URI/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
+  post_build:
+    commands:
+      - echo "Pushing Docker image to ECR"
+      - docker push $ECR_URI/$IMAGE_REPO_NAME:$CODEBUILD_RESOLVED_SOURCE_SOURCE_VERSION
+      - echo "Deploying to EKS with Helm"
+      - helm upgrade --install $RELEASE_NAME $CHART_NAME --namespace $K8S_NAMESPACE --set image.repository=$ECR_URI/$IMAGE_REPO_NAME --set image.tag=$CODEBUILD_RESOLVED_SOURCE_VERSION
+```
+
+#### 2. AWS CodePipeline Configuration (JSON)
+The following JSON configuration sets up the pipeline.
+
+```json
+{
+  "pipeline": {
+    "name": "MyMicroserviceAppPipeline",
+    "roleArn": "arn:aws:iam::$ACCOUNT_ID:role/service-role/MyCodePipelineServiceRole",
+    "artifactStore": {
+      "type": "S3",
+      "location": "$S3_BUCKET"
+    },
+    "stages": [
+      {
+        "name": "Source",
+        "actions": [
+          {
+            "name": "SourceAction",
+            "actionTypeId": {
+              "category": "Source",
+              "owner": "AWS",
+              "provider": "CodeCommit",
+              "version": "1"
+            },
+            "outputArtifacts": [
+              {
+                "name": "SourceOutput"
+              }
+            ],
+            "configuration": {
+              "RepositoryName": "$CODECOMMIT_REPO",
+              "BranchName": "$CODECOMMIT_BRANCH"
+            },
+            "runOrder": 1
+          }
+        ]
+      },
+      {
+        "name": "Build",
+        "actions": [
+          {
+            "name": "BuildAction",
+            "actionTypeId": {
+              "category": "Build",
+              "owner": "AWS",
+              "provider": "CodeBuild",
+              "version": "1"
+            },
+            "inputArtifacts": [
+              {
+                "name": "SourceOutput"
+              }
+            ],
+            "outputArtifacts": [
+              {
+                "name": "BuildOutput"
+              }
+            ],
+            "configuration": {
+              "ProjectName": "$CODEBUILD_PROJECT"
+            },
+            "runOrder": 1
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Placeholders and Variable Descriptions
+
+| Placeholder                  | Description                                          |
+|------------------------------|------------------------------------------------------|
+| `$AWS_DEFAULT_REGION`       | The AWS region where your services are deployed.     |
+| `$ECR_URI`                  | The URI of your Amazon Elastic Container Registry (ECR) repository. |
+| `$IMAGE_REPO_NAME`          | The name of the Docker image repository.              |
+| `$CODEBUILD_RESOLVED_SOURCE_VERSION` | The version of the source code being built (commit ID). |
+| `$RELEASE_NAME`             | The name of the Helm release for your application.    |
+| `$CHART_NAME`               | The name of the Helm chart used to deploy the microservice. |
+| `$K8S_NAMESPACE`            | The Kubernetes namespace where the application will be deployed. |
+| `$S3_BUCKET`                | The name of the S3 bucket used for artifact storage.  |
+| `$ACCOUNT_ID`               | Your AWS account ID.                                  |
+| `$CODECOMMIT_REPO`          | The name of your AWS CodeCommit repository.           |
+| `$CODECOMMIT_BRANCH`        | The branch in CodeCommit that triggers the pipeline.  |
+| `$CODEBUILD_PROJECT`        | The name of the CodeBuild project.                    |
+
+### Guidance Document
+
+1. **Setup AWS CodeCommit:**
+   - Create a CodeCommit repository for your source code.
+   
+2. **Setup AWS ECR:**
+   - Create an Amazon ECR repository to store your Docker images.
+   
+3. **Configure IAM Roles:**
+   - Create an IAM role for CodePipeline with permissions to access CodeCommit, ECR, and CodeBuild.
+   - Create a separate IAM role for CodeBuild with permissions to access ECR and deploy to EKS.
+
+4. **Create EKS Cluster:**
+   - Ensure you have an EKS cluster set up where the microservices will be deployed.
+
+5. **Install Helm:**
+   - Ensure Helm is installed on your local machine and configured to connect to your EKS cluster.
+
+6. **Create S3 Bucket:**
+   - Create an S3 bucket that will be used for storing artifacts.
+
+7. **Deploy the Pipeline:**
+   - Use the AWS Management Console or AWS CLI to create the pipeline using the JSON configuration provided.
+
+8. **Monitor and Adjust:**
+   - Monitor the pipeline execution and make adjustments to the build and deployment processes as necessary.
+
+This setup provides a robust foundation for deploying microservices using Helm in an EKS environment while adhering to best practices in CI/CD pipelines.

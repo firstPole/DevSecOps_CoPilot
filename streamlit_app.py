@@ -12,6 +12,8 @@ from main import generate_pipeline
 from pipelinetypes import *
 import utils
 
+
+
 def identify_pipeline_type(generated_code):
     for pipeline_type, pattern in PIPELINE_TYPE_PATTERNS.items():
         if all(keyword.lower() in generated_code.lower() for keyword in pattern["keywords"]):
@@ -53,7 +55,7 @@ async def generate_pipeline_ui():
                     if generated_code:
                         st.success("Pipeline generated successfully!")
                         pipeline_type, file_extension, language = identify_pipeline_type(generated_code)
-
+                        
                         st.code(generated_code, language=language)
 
                         file_name = f"{pipeline_type}-{datetime.now().strftime('%Y%m%d%H%M%S')}{file_extension}"
@@ -170,7 +172,24 @@ def render_commit_ui():
                 st.error(f"An error occurred during Git commit: {e}")
 
 if __name__ == "__main__":
-    st.set_page_config(page_title="Pipeline Generator")
+    st.set_page_config(page_title="Pipeline Generator",  layout="wide")
+    st.markdown(
+    """
+    <style>
+    .streamlit-expander .streamlit-code-container pre { /* Target code container within expander */
+        white-space: pre-wrap !important; /* Enable text wrapping */
+        overflow-x: auto; /* Allow horizontal scrolling if wrapping creates very long lines*/
+        max-width: 100%; /* Ensure it takes full container width */
+    }
+    .streamlit-code-container pre { /* Target code container */
+        white-space: pre-wrap !important; /* Enable text wrapping */
+        overflow-x: auto; /* Allow horizontal scrolling if wrapping creates very long lines*/
+        max-width: 100%; /* Ensure it takes full container width */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
     st.title("Dev(Sec)Ops Co-Pilot")
     st.sidebar.title("About")
     st.sidebar.text("DevSecOps Co-pilot to assist in generating CI/CD Pipelines as per industry standards.")

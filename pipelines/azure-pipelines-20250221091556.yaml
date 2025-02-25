@@ -1,0 +1,91 @@
+Here’s a sample Azure DevOps pipeline YAML configuration for deploying a microservices application to Azure Kubernetes Service (AKS). This pipeline assumes that you have already set up your AKS cluster and have the necessary permissions configured.
+
+```yaml
+# azure-pipelines.yml
+trigger:
+- main  # Trigger the pipeline on changes to the main branch
+
+variables:
+  # Azure service connection name
+  azureServiceConnection: 'YOUR_AZURE_SERVICE_CONNECTION'
+  # Azure subscription name
+  azureSubscription: 'YOUR_AZURE_SUBSCRIPTION'
+  # Resource group where AKS is located
+  resourceGroup: 'YOUR_RESOURCE_GROUP'
+  # AKS cluster name
+  aksClusterName: 'YOUR_AKS_CLUSTER_NAME'
+  # Namespace in your AKS cluster where the services will be deployed
+  namespace: 'YOUR_NAMESPACE'
+  # Docker image repository
+  dockerRegistry: 'YOUR_DOCKER_REGISTRY'
+  # Docker image name
+  dockerImageName: 'YOUR_DOCKER_IMAGE_NAME'
+  # Docker image tag
+  dockerImageTag: '$(Build.BuildId)' # Using build ID as the image tag
+
+stages:
+- stage: Build
+  displayName: 'Build Docker Image'
+  jobs:
+  - job: Build
+    displayName: 'Build Docker Image'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: Docker@2
+      displayName: 'Build and Push Docker Image'
+      inputs:
+        containerRegistry: '$(dockerRegistry)'
+        repository: '$(dockerImageName)'
+        command: 'buildAndPush'
+        tags: |
+          $(dockerImageTag)
+        Dockerfile: '**/Dockerfile'  # Adjust path as needed
+        buildContext: '$(Build.SourcesDirectory)'
+
+- stage: Deploy
+  displayName: 'Deploy to AKS'
+  jobs:
+  - job: Deploy
+    displayName: 'Deploy to AKS'
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Deploy to AKS'
+      inputs:
+        azureSubscription: '$(azureServiceConnection)'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          az aks get-credentials --resource-group $(resourceGroup) --name $(aksClusterName)
+          kubectl apply -f k8s/deployment.yaml  # Path to your deployment manifest
+          kubectl apply -f k8s/service.yaml     # Path to your service manifest
+          kubectl rollout status deployment/$(dockerImageName) -n $(namespace)
+      env:
+        KUBECONFIG: $(KUBECONFIG)  # Ensure this variable is set up in your pipeline
+
+```
+
+### Placeholders, Variables, and Values
+
+| Placeholder/Variable             | Description                                                                  |
+|----------------------------------|------------------------------------------------------------------------------|
+| `YOUR_AZURE_SERVICE_CONNECTION`  | Name of the Azure service connection configured in Azure DevOps.            |
+| `YOUR_AZURE_SUBSCRIPTION`        | Name of the Azure subscription where the AKS is hosted.                     |
+| `YOUR_RESOURCE_GROUP`            | Name of the resource group containing the AKS cluster.                       |
+| `YOUR_AKS_CLUSTER_NAME`          | Name of the Azure Kubernetes Service (AKS) cluster.                         |
+| `YOUR_NAMESPACE`                 | The Kubernetes namespace where the application will be deployed.            |
+| `YOUR_DOCKER_REGISTRY`           | Docker registry URL or name (e.g., `myregistry.azurecr.io`).               |
+| `YOUR_DOCKER_IMAGE_NAME`         | Name of the Docker image to be built and deployed (e.g., `myapp`).         |
+| `k8s/deployment.yaml`            | Path to the Kubernetes deployment manifest file.                             |
+| `k8s/service.yaml`               | Path to the Kubernetes service manifest file.                                |
+| `$(Build.BuildId)`               | A variable that generates a unique build ID for tagging the Docker image.   |
+
+### Notes
+1. Be sure to replace all placeholder variables with your actual values.
+2. Ensure that you have the necessary permissions set up in Azure DevOps to access AKS and perform deployments.
+3. Adjust the paths to the Dockerfile and Kubernetes manifest files as necessary for your project structure.
+4. The pipeline triggers on changes to the `main` branch; adjust this as needed for your branching strategy. 
+
+This pipeline follows best practices for modularity and reusability, allowing you to easily scale and maintain your CI/CD process for microservices deployed to AKS.

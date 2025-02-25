@@ -1,0 +1,95 @@
+To create an Azure DevOps Pipeline that executes Terraform code upon the approval of a pull request (PR), we will set up a YAML pipeline configuration file. Below are the steps, prerequisites, and the YAML configuration needed to achieve this.
+
+### Prerequisites
+
+1. **Azure DevOps Account**: Ensure you have an Azure DevOps account and a project created.
+2. **Service Connection**: Create a service connection to your Azure subscription that has permissions to deploy resources.
+3. **Terraform Code**: You should have your Terraform code checked into a branch within your Azure DevOps repository.
+4. **Approval Policy**: Set up branch policies on the target branch to require PR approval.
+
+### Azure DevOps Pipeline YAML Configuration
+
+Create a file named `azure-pipelines.yml` in the root of your repository with the following content:
+
+```yaml
+# azure-pipelines.yml
+trigger: none  # Disable CI trigger, we only want PR-based triggers
+
+pr:
+  branches:
+    include:
+      - main  # Specify the target branch for PRs
+
+jobs:
+- job: TerraformDeploy
+  displayName: 'Deploy Terraform Configuration'
+  pool:
+    vmImage: 'ubuntu-latest'  # Use an appropriate VM image
+
+  steps:
+  - checkout: self  # Checkout the code from the repository
+
+  - task: TerraformInstaller@0
+    displayName: 'Install Terraform'
+    inputs:
+      terraformVersion: 'latest'  # Specify the Terraform version
+
+  - script: |
+      terraform init
+    displayName: 'Initialize Terraform'
+
+  - script: |
+      terraform plan -out=tfplan
+    displayName: 'Plan Terraform Changes'
+
+  - script: |
+      terraform apply -auto-approve tfplan
+    displayName: 'Apply Terraform Changes'
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+
+  - task: AzureCLI@2
+    displayName: 'Set up Azure CLI'
+    inputs:
+      azureSubscription: 'YourServiceConnectionName'  # Replace with your service connection name
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        echo "Terraform deployment completed successfully!"
+```
+
+### Steps to Configure the Azure DevOps Pipeline
+
+1. **Create the Pipeline**:
+   - Go to your Azure DevOps project.
+   - Navigate to "Pipelines" > "Pipelines".
+   - Click on "New pipeline".
+   - Select "GitHub" or "Azure Repos Git" based on where your code resides.
+   - Choose the repository that contains your Terraform code.
+   - When prompted, select "Existing Azure Pipelines YAML file" and point to `azure-pipelines.yml`.
+
+2. **Branch Policies**:
+   - Go to "Repos" > "Branches".
+   - Find the branch you want to protect (e.g., `main`).
+   - Click on the three dots and select "Branch policies".
+   - Add a policy to require a minimum number of reviewers for pull requests.
+
+3. **Service Connection**:
+   - Go to "Project Settings" > "Service connections".
+   - Click on "New service connection".
+   - Select "Azure Resource Manager" and follow the prompts to set it up.
+
+4. **Testing**:
+   - Create a pull request targeting the `main` branch.
+   - After approval, the pipeline should trigger and execute the Terraform code.
+
+### Placeholders and Variables to Replace
+
+| Placeholder                           | Description                                            |
+|---------------------------------------|--------------------------------------------------------|
+| `YourServiceConnectionName`           | The name of the Azure service connection you created.  |
+| `main`                                | The name of the branch that will receive PRs.         |
+| `ubuntu-latest`                       | The VM image used for the pipeline; can be changed as needed.|
+
+### Conclusion
+
+This YAML configuration sets up an Azure DevOps pipeline that executes Terraform code only after a pull request is approved. It incorporates best practices for security and modularity, making it easy to adapt to other projects or environments. Ensure that you have the necessary permissions and configurations in place to work seamlessly with Azure DevOps and Terraform.

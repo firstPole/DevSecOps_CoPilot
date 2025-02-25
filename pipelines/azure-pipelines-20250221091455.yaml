@@ -1,0 +1,86 @@
+To create an Azure DevOps Pipeline that executes Terraform code upon the approval of a Pull Request (PR), we will define a YAML-based pipeline configuration. This pipeline will include stages for validating and applying Terraform configurations, with conditions to ensure that it only runs upon PR approval.
+
+### Azure DevOps Pipeline YAML Configuration
+
+```yaml
+# azure-pipelines.yml
+trigger: none
+
+pr:
+  branches:
+    include:
+      - main  # Replace with your target branch for PRs
+
+stages:
+  - stage: Terraform
+    displayName: 'Terraform Stage'
+    jobs:
+      - job: Validate
+        displayName: 'Validate Terraform Configuration'
+        pool:
+          vmImage: 'ubuntu-latest'  # You can change the VM image as per your needs
+        steps:
+          - task: Checkout@2  # Checkout the source code
+          - task: TerraformInstaller@0  # Install Terraform
+            inputs:
+              terraformVersion: '1.0.0'  # Replace with the desired Terraform version
+              
+          - script: |
+              terraform init
+              terraform validate
+            displayName: 'Validate Terraform'
+          
+      - job: Apply
+        displayName: 'Apply Terraform Configuration'
+        dependsOn: Validate
+        condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: Checkout@2  # Checkout the source code
+          
+          - script: |
+              terraform init
+              terraform apply -auto-approve
+            displayName: 'Apply Terraform'
+```
+
+### Pre-requisites for Configuring the Azure DevOps Pipeline
+
+1. **Azure DevOps Project**: Ensure you have an Azure DevOps project set up.
+
+2. **Repository**: Have the Terraform code in a repository within your Azure DevOps project.
+
+3. **Service Connection**: Create a service connection to your Azure subscription to allow Terraform to provision resources. This can be a Service Principal or Managed Identity.
+
+4. **Terraform Installed**: Ensure that the `TerraformInstaller` task is available in your Azure DevOps environment, used to install specific versions of Terraform.
+
+5. **Branch Policies**: Set up branch policies in your Azure DevOps repository to require PR approval before merging. This will ensure the pipeline only runs on approved PRs.
+
+6. **Pipeline Permissions**: Ensure that the pipeline has the necessary permissions to execute and access the resources required by Terraform.
+
+### Placeholders, Variables, and Values
+
+| Placeholder                | Description                                                      |
+|----------------------------|------------------------------------------------------------------|
+| `main`                     | The target branch for PRs. Replace with your repository's main branch. |
+| `1.0.0`                   | The desired version of Terraform to use. Change according to your needs. |
+| `ubuntu-latest`           | The VM image to be used for the build agent. Modify if necessary. |
+
+### Explanation of the Pipeline
+
+1. **Trigger and PR Configuration**:
+   - `trigger: none`: This prevents the pipeline from running on any code pushes.
+   - `pr`: This specifies that the pipeline should run for PRs targeting the specified branches.
+
+2. **Stages**:
+   - The pipeline consists of one stage named `Terraform` with two jobs: `Validate` and `Apply`.
+
+3. **Jobs**:
+   - **Validate Job**: This job checks out the code, installs Terraform, initializes it, and validates the configuration.
+   - **Apply Job**: This job also checks out the code, initializes Terraform, and applies the configuration but only after successful validation and if the build reason is a PR.
+
+4. **Conditions**:
+   - The `Apply` job only runs if the `Validate` job succeeds and the pipeline was triggered by a PR.
+
+This modular approach adheres to best practices for maintainability and scalability, allowing you to easily adapt the pipeline to fit more complex workflows in the future.
